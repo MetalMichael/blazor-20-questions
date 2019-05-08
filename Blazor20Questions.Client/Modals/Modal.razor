@@ -1,0 +1,53 @@
+﻿@using Blazor20Questions.Client.Services
+@using Microsoft.AspNetCore.Components
+@inject ModalService ModalService
+
+<div class="bm-container @(isVisible ? "bm-active" : string.Empty)">
+
+    <div class="bm-overlay" onclick="@CloseModal"></div>
+
+    <div class="blazor-modal">
+        <div class="bm-header">
+            <h3 class="bm-title">@title</h3>
+            <button type="button" class="bm-close" onclick="@CloseModal">
+                <span>&times;</span>
+            </button>
+        </div>
+        <div class="bm-content">
+            @content
+        </div>
+    </div>
+
+</div>
+
+@functions{
+
+    string title;
+    bool isVisible = false;
+    RenderFragment content;
+
+    protected override void OnInit()
+    {
+        ModalService.OnShow += ShowModal;
+        ModalService.OnClose += CloseModal;
+    }
+
+    void ShowModal(string title, RenderFragment content)
+    {
+        this.title = title;
+        this.content = content;
+        isVisible = true;
+
+        StateHasChanged();
+    }
+
+    void CloseModal()
+    {
+        isVisible = false;
+        this.title = "";
+        this.content = null;
+
+        StateHasChanged();
+    }
+
+}

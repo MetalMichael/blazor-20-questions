@@ -1,0 +1,37 @@
+﻿@inject HttpClient Http
+
+<div class="simple-form">
+    <div class="form-group">
+        <label for="first-name">Please enter what you are thinking of...</label>
+        <input bind="@Subject" type="text" class="form-control" id="first-name" placeholder="Enter email" />
+    </div>
+    <button onclick="@SubmitForm" class="btn btn-primary">Submit</button>
+
+    @if (isError)
+    {
+        <div class="error">@error</div>
+    }
+</div>
+
+@functions {
+    bool ShowForm { get; set; } = true;
+    string Subject { get; set; }
+
+    bool isError;
+    string error;
+
+    async Task SubmitForm()
+    {
+        try
+        {
+            isError = false;
+            await Http.PostJsonAsync("api/Game/Create", new { subject = Subject });
+        }
+        catch (Exception e)
+        {
+            System.Console.WriteLine("Error: " + e.ToString());
+            isError = true;
+            error = "An unexpected error occurred";
+        }
+    }
+}

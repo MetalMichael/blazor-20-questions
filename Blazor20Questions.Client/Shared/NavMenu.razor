@@ -1,0 +1,39 @@
+﻿@using Blazor20Questions.Client.Services
+@using Blazor20Questions.Client.Modals
+
+@inject ModalService ModalService
+
+
+<div class="top-row pl-4 navbar navbar-dark">
+    <a class="navbar-brand" href="">Blazor20Questions</a>
+    <button class="navbar-toggler" onclick="@ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass" onclick="@ToggleNavMenu">
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+            <a class="nav-link" href="#" onclick="@ShowModal" Match="NavLinkMatch.All">
+                <span class="oi oi-plus" aria-hidden="true"></span> New Game
+            </a>
+        </li>
+    </ul>
+</div>
+
+@functions {
+    bool collapseNavMenu = true;
+
+    string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    void ShowModal()
+    {
+        System.Console.WriteLine("Test");
+        ModalService.Show("New Game", typeof(NewGame));
+    }
+}
