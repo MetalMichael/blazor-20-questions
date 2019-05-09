@@ -1,4 +1,10 @@
-﻿@inject HttpClient Http
+﻿@using Microsoft.AspNetCore.Blazor.Services
+@using Blazor20Questions.Client.Services
+@using Blazor20Questions.Shared
+
+@inject HttpClient Http
+@inject IUriHelper UriHelper
+@inject ModalService ModalService
 
 <div class="simple-form">
     <div class="form-group">
@@ -14,7 +20,6 @@
 </div>
 
 @functions {
-    bool ShowForm { get; set; } = true;
     string Subject { get; set; }
 
     bool isError;
@@ -25,7 +30,9 @@
         try
         {
             isError = false;
-            await Http.PostJsonAsync("api/Game/Create", new { subject = Subject });
+            var game = await Http.PostJsonAsync<GameResponse>("api/Game/Create", new { subject = Subject });
+            UriHelper.NavigateTo($"/game/{game.Id}");
+            ModalService.Close();
         }
         catch (Exception e)
         {
