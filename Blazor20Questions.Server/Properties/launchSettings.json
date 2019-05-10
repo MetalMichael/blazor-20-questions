@@ -23,19 +23,5 @@
       },
       "applicationUrl": "http://localhost:60711/"
     }
-  },
-
-  "MongoDB": {
-    "Database": "20Q",
-    "Host": "localhost",
-    "Port": 27017,
-    "User": "root",
-    "Password": "example"
-  },
-  "Logging": {
-    "LogLevel": {
-      "Default": "Warning"
-    }
-  },
-  "AllowedHosts": "*"
+  }
 }
