@@ -25,8 +25,6 @@ namespace Blazor20Questions.Server.Controllers
                 return BadRequest(ModelState);
             }
 
-            var id = Guid.NewGuid();
-
             var game = new GameModel
             {
                 Id = Guid.NewGuid(),
@@ -49,6 +47,37 @@ namespace Blazor20Questions.Server.Controllers
             {
                 var game = await _store.GetGame(id);
                 return Ok(game.ToResponseModel());
+            }
+            catch (Exception)
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpPost("{id:Guid}/guess")]
+        public async Task<IActionResult> Guess(Guid id, [FromBody] string guess)
+        {
+            try
+            {
+                var game = await _store.GetGame(id);
+
+                if (game.Won || game.QuestionsTaken >= game.TotalQuestions)
+                {
+                    return BadRequest("This game has ended");
+                }
+
+                if (game.GuessMatches(guess))
+                {
+                    game.Won = true;
+                    await _store.UpdateGame(game);
+                }
+                else if (game.GuessesCountAsQuestions)
+                {
+                    game.QuestionsTaken++;
+                    await _store.UpdateGame(game);
+                }
+
+                return Ok(game);
             }
             catch (Exception)
             {

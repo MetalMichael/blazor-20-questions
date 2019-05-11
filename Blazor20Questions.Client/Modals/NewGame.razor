@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Blazor.Services
+@using System.Net.Http
 @using Blazor20Questions.Client.Services
 @using Blazor20Questions.Shared
 
@@ -8,8 +9,28 @@
 
 <div class="simple-form">
     <div class="form-group">
-        <label for="first-name">Please enter what you are thinking of...</label>
-        <input bind="@Subject" type="text" class="form-control" id="first-name" placeholder="Enter email" />
+        <label>
+            Please enter what you are thinking of...
+            <input type="text" bind="@Subject" class="form-control" id="first-name" placeholder="Enter email" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            Should guesses count as questions?
+            <input type="checkbox" bind="@GuessesCountAsQuestions" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            Gane Length (Minutes):
+            <input type="number" bind="@Minutes" min="@CreateGameModel.MinMinutes" max="@CreateGameModel.MaxMinutes" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label>
+            Maximum Questions:
+            <input type="number" bind="@Questions" min="@CreateGameModel.MinQuestions" max="@CreateGameModel.MaxQuestions" />
+        </label>
     </div>
     <button onclick="@SubmitForm" class="btn btn-primary">Submit</button>
 
@@ -20,7 +41,10 @@
 </div>
 
 @functions {
-    string Subject { get; set; }
+    private string Subject { get; set; }
+    private bool GuessesCountAsQuestions { get; set; }
+    private int Minutes { get; set; } = 10;
+    private int Questions { get; set; } = 20;
 
     bool isError;
     string error;
@@ -30,15 +54,26 @@
         try
         {
             isError = false;
-            var game = await Http.PostJsonAsync<GameResponse>("api/Game/Create", new { subject = Subject });
+            var game = await Http.PostJsonAsync<GameResponse>("api/Game/Create", new CreateGameModel
+            {
+                Subject = Subject,
+                GuessesCountAsQuestions = GuessesCountAsQuestions,
+                Minutes = Minutes,
+                Questions = Questions
+            });
             UriHelper.NavigateTo($"/game/{game.Id}");
             ModalService.Close();
         }
-        catch (Exception e)
+        catch (HttpRequestException e)
         {
             System.Console.WriteLine("Error: " + e.ToString());
             isError = true;
             error = "An unexpected error occurred";
+
+            if (e.Message.Contains("400"))
+            {
+                error += "";
+            }
         }
     }
 }
