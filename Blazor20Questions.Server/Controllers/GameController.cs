@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Blazor20Questions.Shared;
 using Blazor20Questions.Server.Models;
 using Blazor20Questions.Server.Store;
+using System.Linq;
 
 namespace Blazor20Questions.Server.Controllers
 {
@@ -32,6 +33,7 @@ namespace Blazor20Questions.Server.Controllers
                 Expires = DateTime.UtcNow.AddMinutes(model.Minutes),
                 TotalQuestions = model.Questions,
                 GuessesCountAsQuestions = model.GuessesCountAsQuestions,
+                AllowConcurrentQuestions = model.AllowConcurrentQuestions,
                 GuessesTaken = 0
             };
 
@@ -102,6 +104,11 @@ namespace Blazor20Questions.Server.Controllers
                     return BadRequest("No more questions allowed");
                 }
 
+                if(!game.AllowConcurrentQuestions && game.Questions.Count > 0 && !game.Questions.Last().HasAnswer)
+                {
+                    return BadRequest("Only one question allowed at a time");
+                }
+
                 var questionModel = new QuestionModel
                 {
                     Question = question
@@ -130,16 +137,21 @@ namespace Blazor20Questions.Server.Controllers
                     return BadRequest("This game has ended");
                 }
 
-                var question = game.Questions[index];
-                question.Answer = answer;
+                if (index > game.Questions.Count - 1)
+                {
+                    return NotFound();
+                }
 
+                var question = game.Questions[index];
+                if (question.HasAnswer)
+                {
+                    return BadRequest("Question already answered");
+                }
+
+                question.Answer = answer;
                 await _store.UpdateGame(game);
 
                 return Ok(game);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                return NotFound();
             }
             catch (NotFoundException)
             {

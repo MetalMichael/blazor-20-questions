@@ -23,5 +23,6 @@ namespace Blazor20Questions.Shared
         public int Questions { get; set; } = 20;
 
         public bool GuessesCountAsQuestions { get; set; }
+        public bool AllowConcurrentQuestions { get; set; }
     }
 }

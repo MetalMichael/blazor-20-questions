@@ -34,6 +34,14 @@ namespace Blazor20Questions.Shared
         /// </summary>
         public bool GuessesCountAsQuestions { get; set; }
 
+        /// <summary>
+        /// Can ask more than one question at a time
+        /// </summary>
+        public bool AllowConcurrentQuestions { get; set; }
+
+        /// <summary>
+        /// What the whole game is about!
+        /// </summary>
         /// <remarks>
         /// Only populated if game is over
         /// </remarks>

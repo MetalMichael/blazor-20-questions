@@ -15,6 +15,7 @@ namespace Blazor20Questions.Server.Models
         public int GuessesTaken { get; set; }
         public int QuestionsTaken => Questions.Count + GuessesTaken;
         public bool GuessesCountAsQuestions { get; set; }
+        public bool AllowConcurrentQuestions { get; set; }
 
         public IList<QuestionModel> Questions { get; set; }
 
