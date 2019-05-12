@@ -48,7 +48,24 @@ namespace Blazor20Questions.Server.Controllers
         {
             try
             {
-                var game = await _store.GetGame(id);
+                //var game = await _store.GetGame(id);
+                var game = new GameModel
+                {
+                    Id = id,
+                    AllowConcurrentQuestions = false,
+                    Expires = DateTime.Now.AddDays(1),
+                    GuessesCountAsQuestions = true,
+                    TotalQuestions = 10,
+                    GuessesTaken = 5,
+                    Lost = false,
+                    Won = false,
+                    Questions = new List<QuestionModel>
+                    {
+                        new QuestionModel{Question = "is it a bird?", Answer=true },
+                        new QuestionModel{Question = "is it a plane?", Answer= false },
+                        new QuestionModel{Question = "is it a fish?" }
+                    }
+                };
                 return Ok(game.ToResponseModel());
             }
             catch (Exception)

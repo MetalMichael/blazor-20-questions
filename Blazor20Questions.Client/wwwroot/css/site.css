@@ -194,7 +194,7 @@ app {
     color: #bb0000;
 }
 
-h2 {
+h2, h3 {
     padding: 10px 0;
 }
 
