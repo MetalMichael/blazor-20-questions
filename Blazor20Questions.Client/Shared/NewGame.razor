@@ -22,6 +22,12 @@
         </div>
         <div class="form-group">
             <label>
+                Allow more than one question at a time?
+                <input type="checkbox" bind="@game.AllowConcurrentQuestions" />
+            </label>
+        </div>
+        <div class="form-group">
+            <label>
                 Game Length (Minutes):
                 <input type="number" bind="@game.Minutes" min="@CreateGameModel.MinMinutes" max="@CreateGameModel.MaxMinutes" />
             </label>
@@ -61,11 +67,6 @@
             System.Console.WriteLine("Error: " + e.ToString());
             isError = true;
             error = "An unexpected error occurred";
-
-            if (e.Message.Contains("400"))
-            {
-                error += "";
-            }
         }
     }
 }

@@ -5,6 +5,7 @@ using Blazor20Questions.Shared;
 using Blazor20Questions.Server.Models;
 using Blazor20Questions.Server.Store;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Blazor20Questions.Server.Controllers
 {
@@ -57,7 +58,7 @@ namespace Blazor20Questions.Server.Controllers
         }
 
         [HttpPost("{id:Guid}/guess")]
-        public async Task<IActionResult> Guess(Guid id, [FromBody] string guess)
+        public async Task<IActionResult> Guess(Guid id, [FromBody] GuessModel guess)
         {
             try
             {
@@ -68,7 +69,7 @@ namespace Blazor20Questions.Server.Controllers
                     return BadRequest("This game has ended");
                 }
 
-                if (game.GuessMatches(guess))
+                if (game.GuessMatches(guess.Guess))
                 {
                     game.Won = true;
                     await _store.UpdateGame(game);
@@ -88,7 +89,7 @@ namespace Blazor20Questions.Server.Controllers
         }
 
         [HttpPost("{id:Guid}/ask")]
-        public async Task<IActionResult> Ask(Guid id, [FromBody] string question)
+        public async Task<IActionResult> Ask(Guid id, [FromBody] AskQuestionModel question)
         {
             try
             {
@@ -111,7 +112,7 @@ namespace Blazor20Questions.Server.Controllers
 
                 var questionModel = new QuestionModel
                 {
-                    Question = question
+                    Question = question.Question
                 };
 
                 game.Questions.Add(questionModel);
@@ -126,7 +127,7 @@ namespace Blazor20Questions.Server.Controllers
         }
 
         [HttpPost("{id:Guid}/answer/{index:int}")]
-        public async Task<IActionResult> Answer(Guid id, int index, [FromBody] bool answer)
+        public async Task<IActionResult> Answer(Guid id, int index, [FromBody] AnswerModel answer)
         {
             try
             {
@@ -148,7 +149,7 @@ namespace Blazor20Questions.Server.Controllers
                     return BadRequest("Question already answered");
                 }
 
-                question.Answer = answer;
+                question.Answer = answer.Answer;
                 await _store.UpdateGame(game);
 
                 return Ok(game);

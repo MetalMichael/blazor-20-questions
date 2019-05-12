@@ -106,13 +106,12 @@ else
     {
         try
         {
-            var res = await Http.PostAsync($"api/Game/{Id}/answer", new StringContent(answer.ToString()));
-
-            res.EnsureSuccessStatusCode();
-
-            var content = await res.Content.ReadAsStringAsync();
-            _game = JsonConvert.DeserializeObject<GameResponse>(content);
-
+            _game = await Http.PostJsonAsync<GameResponse>(
+                $"api/Game/{Id}/answer",
+                new AnswerModel
+                {
+                    Answer = answer
+                });
         }
         catch (Exception e)
         {

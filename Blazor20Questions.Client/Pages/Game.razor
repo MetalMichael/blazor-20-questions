@@ -48,11 +48,10 @@ else if (_game != null)
                 <h2>Ask a Question...</h2>
                 <form onsubmit="@AskQuestion">
                     <div class="simple-form">
-                        <div class="form-group">
-                            <label>
-                                Type an yes/no question below
-                                <input type="text" bind="@Question" class="form-control" id="first-name" placeholder="Is it a...?" />
-                            </label>
+                        <div class="form-group guess">
+                            <label>Type a yes/no question below</label>
+                            <input type="text" bind="@Question" class="form-control" id="first-name" placeholder="Is it a...?" />
+                            <input type="submit" class="btn btn-primary" value="Ask" />
                         </div>
                     </div>
                 </form>
@@ -71,11 +70,10 @@ else if (_game != null)
                 }
                 <form onsubmit="@MakeGuess">
                     <div class="simple-form">
-                        <div class="form-group">
-                            <label>
-                                Guess the Subject
-                                <input type="text" bind="@Guess" class="form-control" id="first-name" placeholder="house" />
-                            </label>
+                        <div class="form-group guess">
+                            <label>Guess the Subject</label>
+                            <input type="text" bind="@Guess" class="form-control" id="first-name" placeholder="house" />
+                            <input type="submit" class="btn btn-primary" value="Guess" />
                         </div>
                     </div>
                 </form>
@@ -118,13 +116,12 @@ else
     {
         try
         {
-            var res = await Http.PostAsync($"api/Game/{Id}/ask", new StringContent(Question));
-
-            res.EnsureSuccessStatusCode();
-
-            var content = await res.Content.ReadAsStringAsync();
-            _game = JsonConvert.DeserializeObject<GameResponse>(content);
-
+            _game = await Http.PostJsonAsync<GameResponse>(
+                $"api/Game/{Id}/ask",
+                new AskQuestionModel
+                {
+                    Question = Question
+                });
         }
         catch (Exception e)
         {
@@ -137,12 +134,12 @@ else
     {
         try
         {
-            var res = await Http.PostAsync($"api/Game/{Id}/guess", new StringContent(Guess));
-
-            res.EnsureSuccessStatusCode();
-
-            var content = await res.Content.ReadAsStringAsync();
-            _game = JsonConvert.DeserializeObject<GameResponse>(content);
+            _game = await Http.PostJsonAsync<GameResponse>(
+                $"api/Game/{Id}/guess",
+                new GuessModel
+                {
+                    Guess = Guess
+                });
         }
         catch (Exception e)
         {
