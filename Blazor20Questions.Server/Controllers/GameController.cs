@@ -18,7 +18,7 @@ namespace Blazor20Questions.Server.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Create(CreateGameModel model)
+        public async Task<IActionResult> Create([FromBody] CreateGameModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -61,7 +61,7 @@ namespace Blazor20Questions.Server.Controllers
             {
                 var game = await _store.GetGame(id);
 
-                if (game.Won || game.QuestionsTaken >= game.TotalQuestions)
+                if (game.IsComplete)
                 {
                     return BadRequest("This game has ended");
                 }

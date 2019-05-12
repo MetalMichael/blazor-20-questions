@@ -1,5 +1,4 @@
-﻿@using Microsoft.AspNetCore.Blazor.Services
-@using System.Net.Http
+﻿@using System.Net.Http
 @using Blazor20Questions.Client.Services
 @using Blazor20Questions.Shared
 
@@ -7,44 +6,43 @@
 @inject IUriHelper UriHelper
 @inject ModalService ModalService
 
-<div class="simple-form">
-    <div class="form-group">
-        <label>
-            Please enter what you are thinking of...
-            <input type="text" bind="@Subject" class="form-control" id="first-name" placeholder="Enter email" />
-        </label>
-    </div>
-    <div class="form-group">
-        <label>
-            Should guesses count as questions?
-            <input type="checkbox" bind="@GuessesCountAsQuestions" />
-        </label>
-    </div>
-    <div class="form-group">
-        <label>
-            Gane Length (Minutes):
-            <input type="number" bind="@Minutes" min="@CreateGameModel.MinMinutes" max="@CreateGameModel.MaxMinutes" />
-        </label>
-    </div>
-    <div class="form-group">
-        <label>
-            Maximum Questions:
-            <input type="number" bind="@Questions" min="@CreateGameModel.MinQuestions" max="@CreateGameModel.MaxQuestions" />
-        </label>
-    </div>
-    <button onclick="@SubmitForm" class="btn btn-primary">Submit</button>
+<EditForm OnValidSubmit="SubmitForm" Model="@game">
+    <div class="simple-form">
+        <div class="form-group">
+            <label>
+                Please enter what you are thinking of...
+                <input type="text" bind="@game.Subject" class="form-control" id="first-name" placeholder="Enter subject..." />
+            </label>
+        </div>
+        <div class="form-group">
+            <label>
+                Should guesses count as questions?
+                <input type="checkbox" bind="@game.GuessesCountAsQuestions" />
+            </label>
+        </div>
+        <div class="form-group">
+            <label>
+                Game Length (Minutes):
+                <input type="number" bind="@game.Minutes" min="@CreateGameModel.MinMinutes" max="@CreateGameModel.MaxMinutes" />
+            </label>
+        </div>
+        <div class="form-group">
+            <label>
+                Maximum Questions:
+                <input type="number" bind="@game.Questions" min="@CreateGameModel.MinQuestions" max="@CreateGameModel.MaxQuestions" />
+            </label>
+        </div>
+        <input type="submit" class="btn btn-primary" value="Submit" />
 
-    @if (isError)
-    {
-        <div class="error">@error</div>
-    }
-</div>
+        @if (isError)
+        {
+            <div class="error">@error</div>
+        }
+    </div>
+</EditForm>
 
 @functions {
-    private string Subject { get; set; }
-    private bool GuessesCountAsQuestions { get; set; }
-    private int Minutes { get; set; } = 10;
-    private int Questions { get; set; } = 20;
+    CreateGameModel game = new CreateGameModel();
 
     bool isError;
     string error;
@@ -54,14 +52,8 @@
         try
         {
             isError = false;
-            var game = await Http.PostJsonAsync<GameResponse>("api/Game/Create", new CreateGameModel
-            {
-                Subject = Subject,
-                GuessesCountAsQuestions = GuessesCountAsQuestions,
-                Minutes = Minutes,
-                Questions = Questions
-            });
-            UriHelper.NavigateTo($"/game/{game.Id}");
+            var createdGame = await Http.PostJsonAsync<GameResponse>("api/Game/Create", game);
+            UriHelper.NavigateTo($"/game/{createdGame.Id}");
             ModalService.Close();
         }
         catch (HttpRequestException e)
