@@ -53,7 +53,7 @@
         {
             isError = false;
             var createdGame = await Http.PostJsonAsync<GameResponse>("api/Game/Create", game);
-            UriHelper.NavigateTo($"/game/{createdGame.Id}");
+            UriHelper.NavigateTo($"/host/{createdGame.Id}");
             ModalService.Close();
         }
         catch (HttpRequestException e)

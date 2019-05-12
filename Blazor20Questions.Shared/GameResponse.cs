@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Blazor20Questions.Shared
 {
@@ -46,5 +47,10 @@ namespace Blazor20Questions.Shared
         /// Only populated if game is over
         /// </remarks>
         public string Subject { get; set; }
+
+        /// <summary>
+        /// List of questions that have been asked, with answers (if given)
+        /// </summary>
+        public IList<QuestionResponse> Questions { get; set; }
     }
 }

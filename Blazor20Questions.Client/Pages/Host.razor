@@ -1,0 +1,123 @@
+﻿@page "/host/{Id:guid}"
+@using System.Net.Http
+@using Newtonsoft.Json
+@using Blazor20Questions.Shared
+@inject HttpClient Http
+@inject IUriHelper UriHelper
+
+<h1>20 Questions - Host Controls</h1>
+
+<div class="link">
+    <div>Send this link to your friends to join in the fun!</div>
+    <input type="text" readonly value="@UriHelper.GetBaseUri()game/@Id" onclick="this.select()" size="80" />
+</div>
+
+@if (_error)
+{
+    <div class="error">
+        Error loading game: @_errorMessage
+    </div>
+}
+else if (_game != null)
+{
+    if (_game.Complete)
+    {
+        if (_game.Won)
+        {
+            <div class="success">The guesser(s) guessed correctly!</div>
+        }
+        else
+        {
+            <div class="fail">The guesser(s) did not guess "@_game.Subject" in time</div>
+        }
+    }
+    else
+    {
+        <div class="host game">
+            <span>Remaining Questions: @_game.QuestionsRemaining</span>
+
+            <h2>Questions</h2>
+            <div class="questions">
+                @foreach (var question in _game.Questions)
+                {
+                    <div class="question">
+                        <span class="question-text">@question.Question</span>
+                        @if (question.HasAnswer)
+                        {
+                            <span class="question-answer">@((question.Answer.Value) ? "Yes" : "No")</span>
+                        }
+                        else
+                        {
+                            <span class="question-no"><button onclick="@AnswerNo">NO</button></span>
+                            <span class="question-no"><button onclick="@AnswerYes">YES</button></span>
+                        }
+
+                    </div>
+                }
+            </div>
+            <span>Remaining Questions: @_game.QuestionsRemaining</span>
+        </div>
+    }
+}
+else
+{
+    <div>Loading...</div>
+}
+
+@functions {
+
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private string Question { get; set; }
+    private string Guess { get; set; }
+
+    private GameResponse _game;
+    private bool _error;
+    private string _errorMessage;
+
+    protected override async Task OnInitAsync()
+    {
+        try
+        {
+            _error = false;
+            _game = await Http.GetJsonAsync<GameResponse>($"api/Game/{Id}");
+        }
+        catch (Exception e)
+        {
+            _error = true;
+            _errorMessage = e.Message;
+        }
+    }
+
+    private async Task AnswerYes()
+    {
+        await AnswerQuestion(true);
+    }
+
+    private async Task AnswerNo()
+    {
+        await AnswerQuestion(false);
+    }
+
+    private async Task AnswerQuestion(bool answer)
+    {
+        try
+        {
+            var res = await Http.PostAsync($"api/Game/{Id}/answer", new StringContent(answer.ToString()));
+
+            res.EnsureSuccessStatusCode();
+
+            var content = await res.Content.ReadAsStringAsync();
+            _game = JsonConvert.DeserializeObject<GameResponse>(content);
+
+        }
+        catch (Exception e)
+        {
+            _error = true;
+            _errorMessage = e.Message;
+        }
+    }
+
+
+}
