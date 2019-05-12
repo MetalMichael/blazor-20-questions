@@ -1,5 +1,6 @@
 ﻿using Blazor20Questions.Shared;
 using System;
+using System.Collections.Generic;
 
 namespace Blazor20Questions.Server.Models
 {
@@ -11,8 +12,11 @@ namespace Blazor20Questions.Server.Models
         public DateTime Expires { get; set; }
         public string Subject { get; set; }
         public int TotalQuestions { get; set; }
-        public int QuestionsTaken { get; set; }
+        public int GuessesTaken { get; set; }
+        public int QuestionsTaken => Questions.Count + GuessesTaken;
         public bool GuessesCountAsQuestions { get; set; }
+
+        public IList<QuestionModel> Questions { get; set; }
 
         public bool IsComplete => Won || Lost || DateTime.UtcNow > Expires;
 

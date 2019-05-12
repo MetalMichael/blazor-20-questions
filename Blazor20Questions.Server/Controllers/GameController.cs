@@ -10,7 +10,7 @@ namespace Blazor20Questions.Server.Controllers
     [Route("api/[controller]")]
     public class GameController : Controller
     {
-        private IGameStore _store;
+        private readonly IGameStore _store;
 
         public GameController(IGameStore gameStore)
         {
@@ -32,7 +32,7 @@ namespace Blazor20Questions.Server.Controllers
                 Expires = DateTime.UtcNow.AddMinutes(model.Minutes),
                 TotalQuestions = model.Questions,
                 GuessesCountAsQuestions = model.GuessesCountAsQuestions,
-                QuestionsTaken = 0
+                GuessesTaken = 0
             };
 
             await _store.CreateNewGame(game);
@@ -73,13 +73,75 @@ namespace Blazor20Questions.Server.Controllers
                 }
                 else if (game.GuessesCountAsQuestions)
                 {
-                    game.QuestionsTaken++;
+                    game.GuessesTaken++;
                     await _store.UpdateGame(game);
                 }
 
                 return Ok(game);
             }
-            catch (Exception)
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpPost("{id:Guid}/ask")]
+        public async Task<IActionResult> Ask(Guid id, [FromBody] string question)
+        {
+            try
+            {
+                var game = await _store.GetGame(id);
+
+                if (game.IsComplete)
+                {
+                    return BadRequest("This game has ended");
+                }
+
+                if (game.QuestionsTaken >= game.TotalQuestions)
+                {
+                    return BadRequest("No more questions allowed");
+                }
+
+                var questionModel = new QuestionModel
+                {
+                    Question = question
+                };
+
+                game.Questions.Add(questionModel);
+                await _store.UpdateGame(game);
+
+                return Ok(game);
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpPost("{id:Guid}/answer/{index:int}")]
+        public async Task<IActionResult> Answer(Guid id, int index, [FromBody] bool answer)
+        {
+            try
+            {
+                var game = await _store.GetGame(id);
+
+                if (game.IsComplete)
+                {
+                    return BadRequest("This game has ended");
+                }
+
+                var question = game.Questions[index];
+                question.Answer = answer;
+
+                await _store.UpdateGame(game);
+
+                return Ok(game);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                return NotFound();
+            }
+            catch (NotFoundException)
             {
                 return NotFound();
             }
