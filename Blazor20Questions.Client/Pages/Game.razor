@@ -4,7 +4,7 @@
 @using Blazor20Questions.Shared
 @inject HttpClient Http
 
-<h1>Game: @Id</h1>
+<h1>20 Questions Game</h1>
 
 @if (_error)
 {
@@ -14,6 +14,8 @@
 }
 else if (_game != null)
 {
+    <Rules game="@_game" />
+
     if (_game.Complete)
     {
         if (_game.Won)
@@ -34,26 +36,26 @@ else if (_game != null)
                 {
                     <div class="question">
                         <span class="question-text">@question.Question</span>
-                        <span class="question-answer">@(question.HasAnswer ? (question.Answer.Value) ? "Yes" : "No" : "")</span>
+                        <span class="question-answer">@(question.HasAnswer ? (question.Answer.Value) ? "Yes" : "No" : "(unanswered)")</span>
                     </div>
                 }
             </div>
 
-            <span>Remaining Questions: @_game.QuestionsRemaining</span>
+            <div class="remaining">Remaining Questions: @_game.QuestionsRemaining</div>
 
             @if (_game.QuestionsRemaining > 0)
             {
                 <h2>Ask a Question...</h2>
-                <EditForm onsubmit="@AskQuestion">
+                <form onsubmit="@AskQuestion">
                     <div class="simple-form">
                         <div class="form-group">
                             <label>
-                                Yes or No Question
+                                Type an yes/no question below
                                 <input type="text" bind="@Question" class="form-control" id="first-name" placeholder="Is it a...?" />
                             </label>
                         </div>
                     </div>
-                </EditForm>
+                </form>
             }
 
             @if (!_game.GuessesCountAsQuestions || _game.QuestionsRemaining > 0)
@@ -67,7 +69,7 @@ else if (_game != null)
                 {
                     <span>Guesses are free, and do not count as questions. Guess away!</span>
                 }
-                <EditForm onsubmit="@MakeGuess">
+                <form onsubmit="@MakeGuess">
                     <div class="simple-form">
                         <div class="form-group">
                             <label>
@@ -76,7 +78,7 @@ else if (_game != null)
                             </label>
                         </div>
                     </div>
-                </EditForm>
+                </form>
             }
         </div>
     }

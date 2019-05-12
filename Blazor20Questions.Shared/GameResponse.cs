@@ -31,6 +31,11 @@ namespace Blazor20Questions.Shared
         public int QuestionsRemaining { get; set; }
 
         /// <summary>
+        /// Total number of questions at the start of the game
+        /// </summary>
+        public int TotalQuestions { get; set; }
+
+        /// <summary>
         /// Whether guesses count as questions
         /// </summary>
         public bool GuessesCountAsQuestions { get; set; }

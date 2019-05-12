@@ -1,0 +1,17 @@
+﻿@using Blazor20Questions.Shared
+
+<div class="game-info">
+    <h3>Rules</h3>
+    <ul>
+        <li>Total Questions: @game.TotalQuestions</li>
+        <li>Guesses count as Questions: @game.GuessesCountAsQuestions</li>
+        <li>Allow concurrent Questions: @game.AllowConcurrentQuestions</li>
+        <li>End Time: @game.EndTime.ToShortTimeString()</li>
+    </ul>
+</div>
+
+
+@functions {
+    [Parameter]
+    public GameResponse game { get; set; }
+}

@@ -1,6 +1,7 @@
 ﻿using Blazor20Questions.Shared;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Blazor20Questions.Server.Models
 {
@@ -30,7 +31,10 @@ namespace Blazor20Questions.Server.Models
                 Complete = IsComplete,
                 EndTime = Expires,
                 QuestionsRemaining = TotalQuestions - QuestionsTaken,
-                GuessesCountAsQuestions = GuessesCountAsQuestions
+                TotalQuestions = TotalQuestions,
+                GuessesCountAsQuestions = GuessesCountAsQuestions,
+                AllowConcurrentQuestions = AllowConcurrentQuestions,
+                Questions = Questions.Select(q => q.ToResponseModel()).ToList()
             };
 
             if (IsComplete) {
