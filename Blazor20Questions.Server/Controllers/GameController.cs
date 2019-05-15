@@ -6,6 +6,8 @@ using Blazor20Questions.Server.Models;
 using Blazor20Questions.Server.Store;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.SignalR;
+using Blazor20Questions.Server.Hubs;
 
 namespace Blazor20Questions.Server.Controllers
 {
@@ -13,10 +15,12 @@ namespace Blazor20Questions.Server.Controllers
     public class GameController : Controller
     {
         private readonly IGameStore _store;
+        private readonly IHubClients _clients;
 
-        public GameController(IGameStore gameStore)
+        public GameController(IGameStore gameStore, IHubContext<GameHub> context)
         {
             _store = gameStore;
+            _clients = context.Clients;
         }
 
         [HttpPost("[action]")]
@@ -81,7 +85,9 @@ namespace Blazor20Questions.Server.Controllers
                     await _store.UpdateGame(game);
                 }
 
-                return Ok(game);
+                var response = game.ToResponseModel();
+                await GameHub.SendUpdate(_clients, id, response);
+                return Ok(response);
             }
             catch (NotFoundException)
             {
@@ -119,7 +125,9 @@ namespace Blazor20Questions.Server.Controllers
                 game.Questions.Add(questionModel);
                 await _store.UpdateGame(game);
 
-                return Ok(game);
+                var response = game.ToResponseModel();
+                await GameHub.SendUpdate(_clients, id, response);
+                return Ok(response);
             }
             catch (NotFoundException)
             {
@@ -153,7 +161,9 @@ namespace Blazor20Questions.Server.Controllers
                 question.Answer = answer.Answer;
                 await _store.UpdateGame(game);
 
-                return Ok(game);
+                var response = game.ToResponseModel();
+                await GameHub.SendUpdate(_clients, id, response);
+                return Ok(response);
             }
             catch (NotFoundException)
             {
