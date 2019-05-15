@@ -8,9 +8,9 @@ namespace Blazor20Questions.Server.Hubs
 {
     public class GameHub : Hub
     {
-        public Task Register(Guid game)
+        public Task Register(string gameId)
         {
-            return Groups.AddToGroupAsync(Context.ConnectionId, game.ToString());
+            return Groups.AddToGroupAsync(Context.ConnectionId, gameId);
         } 
 
         public static async Task SendUpdate(IHubClients clients, Guid id, GameResponse game)

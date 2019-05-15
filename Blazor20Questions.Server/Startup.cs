@@ -1,4 +1,5 @@
 using Blazor20Questions.Server.Config;
+using Blazor20Questions.Server.Hubs;
 using Blazor20Questions.Server.Store;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -33,6 +34,7 @@ namespace Blazor20Questions.Server
                     new[] { "application/octet-stream" });
             });
             services.AddSingleton<IGameStore>(new GameStore(config.MongoDB));
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,6 +53,11 @@ namespace Blazor20Questions.Server
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapDefaultControllerRoute();
+            });
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<GameHub>("/hubs/game");
             });
 
             app.UseBlazor<Client.Startup>();
