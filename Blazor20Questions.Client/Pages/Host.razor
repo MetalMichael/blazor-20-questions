@@ -1,9 +1,11 @@
 ﻿@page "/host/{Id:guid}"
 @using System.Net.Http
-@using System.Timers
 @using Blazor20Questions.Shared
+@using Blazor.Extensions
+@using Newtonsoft.Json
 @inject HttpClient Http
 @inject IUriHelper UriHelper
+@inject IJSRuntime JsRuntime;
 
 <h1>20 Questions - Host Controls</h1>
 
@@ -41,25 +43,27 @@ else if (_game != null)
             @if (!_game.Questions.Any())
             {
                 <div>No questions asked yet!</div>
-            } else {
-            <div class="questions">
-                @foreach (var question in _game.Questions)
-                {
-                    <div class="question">
-                        <span class="question-text">@question.Question</span>
-                        @if (question.HasAnswer)
-                        {
-                            <span class="question-answer">@((question.Answer.Value) ? "Yes" : "No")</span>
-                        }
-                        else
-                        {
-                            <span class="question-no"><button onclick="@AnswerNo">NO</button></span>
-                            <span class="question-no"><button onclick="@AnswerYes">YES</button></span>
-                        }
+            }
+            else
+            {
+                <div class="questions">
+                    @foreach (var question in _game.Questions)
+                    {
+                        <div class="question">
+                            <span class="question-text">@question.Question</span>
+                            @if (question.HasAnswer)
+                            {
+                                <span class="question-answer">@((question.Answer.Value) ? "Yes" : "No")</span>
+                            }
+                            else
+                            {
+                                <span class="question-no"><button onclick="@(() => Answer(question, true))">NO</button></span>
+                                <span class="question-no"><button onclick="@(() => Answer(question, true))">YES</button></span>
+                            }
 
-                    </div>
-                }
-            </div>
+                        </div>
+                    }
+                </div>
             }
             <span>Remaining Questions: @_game.QuestionsRemaining</span>
         </div>
@@ -83,7 +87,7 @@ else
     private GameResponse _game;
     private bool _error;
     private string _errorMessage;
-    private Timer _timer;
+    private HubConnection _connection;
 
     protected override async Task OnInitAsync()
     {
@@ -92,7 +96,7 @@ else
             _error = false;
             _game = await Http.GetJsonAsync<GameResponse>($"api/Game/{Id}");
 
-            SetupRefresh();
+            await SetupRefresh();
         }
         catch (Exception e)
         {
@@ -101,22 +105,29 @@ else
         }
     }
 
-    private async Task AnswerYes()
+    private async Task SetupRefresh()
     {
-        await AnswerQuestion(true);
+        _connection = new HubConnectionBuilder(JsRuntime).WithUrl("/hubs/game").Build();
+        _connection.On<string>("UpdateGame", UpdateGame);
+        await _connection.StartAsync();
+        await _connection.InvokeAsync("Register", Id);
     }
 
-    private async Task AnswerNo()
+    private Task UpdateGame(string game)
     {
-        await AnswerQuestion(false);
+        _game = JsonConvert.DeserializeObject<GameResponse>(game);
+        StateHasChanged();
+        Console.WriteLine("Updated game");
+        return Task.CompletedTask;
     }
 
-    private async Task AnswerQuestion(bool answer)
+    private async Task Answer(QuestionResponse question, bool answer)
     {
         try
         {
+            var questionIndex = _game.Questions.IndexOf(question);
             _game = await Http.PostJsonAsync<GameResponse>(
-                $"api/Game/{Id}/answer",
+                $"api/Game/{Id}/answer/{questionIndex}",
                 new AnswerModel
                 {
                     Answer = answer
