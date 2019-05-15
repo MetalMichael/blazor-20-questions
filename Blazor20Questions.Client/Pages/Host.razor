@@ -1,6 +1,6 @@
 ﻿@page "/host/{Id:guid}"
 @using System.Net.Http
-@using Newtonsoft.Json
+@using System.Timers
 @using Blazor20Questions.Shared
 @inject HttpClient Http
 @inject IUriHelper UriHelper
@@ -11,7 +11,6 @@
     <div>Send this link to your friends to join in the fun!</div>
     <input type="text" readonly value="@UriHelper.GetBaseUri()game/@Id" onclick="this.select()" size="80" />
 </div>
-
 @if (_error)
 {
     <div class="error">
@@ -39,6 +38,10 @@ else if (_game != null)
             <span>Remaining Questions: @_game.QuestionsRemaining</span>
 
             <h2>Questions</h2>
+            @if (!_game.Questions.Any())
+            {
+                <div>No questions asked yet!</div>
+            } else {
             <div class="questions">
                 @foreach (var question in _game.Questions)
                 {
@@ -57,6 +60,7 @@ else if (_game != null)
                     </div>
                 }
             </div>
+            }
             <span>Remaining Questions: @_game.QuestionsRemaining</span>
         </div>
     }
@@ -68,6 +72,8 @@ else
 
 @functions {
 
+    private const int RefreshDelay = 1000;
+
     [Parameter]
     public Guid Id { get; set; }
 
@@ -77,6 +83,7 @@ else
     private GameResponse _game;
     private bool _error;
     private string _errorMessage;
+    private Timer _timer;
 
     protected override async Task OnInitAsync()
     {
@@ -84,6 +91,8 @@ else
         {
             _error = false;
             _game = await Http.GetJsonAsync<GameResponse>($"api/Game/{Id}");
+
+            SetupRefresh();
         }
         catch (Exception e)
         {
