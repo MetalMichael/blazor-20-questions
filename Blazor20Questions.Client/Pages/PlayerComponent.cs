@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace Blazor20Questions.Client.Pages
 {
@@ -43,6 +44,15 @@ namespace Blazor20Questions.Client.Pages
 
         private async Task SetupRefresh()
         {
+            if (_game.Complete)
+                return;
+
+            // Re-render when game has expired
+            var t = new Timer();
+            t.Elapsed += (o, e) => StateHasChanged();
+            t.Interval = (_game.EndTime - DateTime.UtcNow).TotalMilliseconds;
+            t.Start();
+
             _connection = new HubConnectionBuilder(JsRuntime).WithUrl("/hubs/game").Build();
             _connection.On<string>("UpdateGame", UpdateGame);
             await _connection.StartAsync();
