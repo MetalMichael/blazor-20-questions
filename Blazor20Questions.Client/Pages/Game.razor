@@ -52,7 +52,7 @@ else if (_game != null)
             @if (_game.QuestionsRemaining > 0)
             {
                 <h2>Ask a Question...</h2>
-                @if (!_game.AllowConcurrentQuestions && !_game.Questions.Last().HasAnswer)
+                @if (!_game.AllowConcurrentQuestions && !_game.Questions.LastOrDefault()?.HasAnswer == true)
                 {
                     <div class="waiting">Waiting for previous question to be answered</div>
                 }
@@ -118,6 +118,7 @@ else
                 {
                     Question = Question
                 });
+            Question = "";
         }
         catch (Exception e)
         {
@@ -136,6 +137,7 @@ else
                 {
                     Guess = Guess
                 });
+            Guess = "";
         }
         catch (Exception e)
         {
