@@ -35,7 +35,8 @@ namespace Blazor20Questions.Server.Controllers
                 TotalQuestions = model.Questions,
                 GuessesCountAsQuestions = model.GuessesCountAsQuestions,
                 AllowConcurrentQuestions = model.AllowConcurrentQuestions,
-                GuessesTaken = 0
+                GuessesTaken = 0,
+                Questions = new List<QuestionModel>(0)
             };
 
             await _store.CreateNewGame(game);
@@ -48,24 +49,7 @@ namespace Blazor20Questions.Server.Controllers
         {
             try
             {
-                //var game = await _store.GetGame(id);
-                var game = new GameModel
-                {
-                    Id = id,
-                    AllowConcurrentQuestions = false,
-                    Expires = DateTime.Now.AddDays(1),
-                    GuessesCountAsQuestions = true,
-                    TotalQuestions = 10,
-                    GuessesTaken = 5,
-                    Lost = false,
-                    Won = false,
-                    Questions = new List<QuestionModel>
-                    {
-                        new QuestionModel{Question = "is it a bird?", Answer=true },
-                        new QuestionModel{Question = "is it a plane?", Answer= false },
-                        new QuestionModel{Question = "is it a fish?" }
-                    }
-                };
+                var game = await _store.GetGame(id);
                 return Ok(game.ToResponseModel());
             }
             catch (Exception)
