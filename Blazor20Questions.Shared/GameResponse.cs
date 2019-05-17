@@ -57,5 +57,10 @@ namespace Blazor20Questions.Shared
         /// List of questions that have been asked, with answers (if given)
         /// </summary>
         public IList<QuestionResponse> Questions { get; set; }
+
+        /// <summary>
+        /// List of guesses. If won, then the last was correct!
+        /// </summary>
+        public IList<string> Guesses { get; set; }
     }
 }

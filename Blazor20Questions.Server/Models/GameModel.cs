@@ -13,12 +13,13 @@ namespace Blazor20Questions.Server.Models
         public DateTime Expires { get; set; }
         public string Subject { get; set; }
         public int TotalQuestions { get; set; }
-        public int GuessesTaken { get; set; }
-        public int QuestionsTaken => Questions.Count + GuessesTaken;
+        public int GuessesTaken => Guesses.Count;
+        public int QuestionsTaken => Questions.Count + (GuessesCountAsQuestions ? GuessesTaken : 0);
         public bool GuessesCountAsQuestions { get; set; }
         public bool AllowConcurrentQuestions { get; set; }
 
         public IList<QuestionModel> Questions { get; set; }
+        public IList<string> Guesses { get; set; }
 
         public bool IsComplete => Won || Lost || DateTime.UtcNow > Expires;
 
@@ -34,7 +35,8 @@ namespace Blazor20Questions.Server.Models
                 TotalQuestions = TotalQuestions,
                 GuessesCountAsQuestions = GuessesCountAsQuestions,
                 AllowConcurrentQuestions = AllowConcurrentQuestions,
-                Questions = Questions.Select(q => q.ToResponseModel()).ToList()
+                Questions = Questions.Select(q => q.ToResponseModel()).ToList(),
+                Guesses = Guesses
             };
 
             if (IsComplete) {

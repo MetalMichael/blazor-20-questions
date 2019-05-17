@@ -39,8 +39,8 @@ namespace Blazor20Questions.Server.Controllers
                 TotalQuestions = model.Questions,
                 GuessesCountAsQuestions = model.GuessesCountAsQuestions,
                 AllowConcurrentQuestions = model.AllowConcurrentQuestions,
-                GuessesTaken = 0,
-                Questions = new List<QuestionModel>(0)
+                Questions = new List<QuestionModel>(0),
+                Guesses = new List<string>(0)
             };
 
             await _store.CreateNewGame(game);
@@ -74,16 +74,16 @@ namespace Blazor20Questions.Server.Controllers
                     return BadRequest("This game has ended");
                 }
 
+                game.Guesses.Add(guess.Guess);
                 if (game.GuessMatches(guess.Guess))
                 {
                     game.Won = true;
-                    await _store.UpdateGame(game);
                 }
-                else if (game.GuessesCountAsQuestions)
+                else if (game.GuessesCountAsQuestions && game.QuestionsTaken >= game.TotalQuestions)
                 {
-                    game.GuessesTaken++;
-                    await _store.UpdateGame(game);
+                    game.Lost = true;
                 }
+                await _store.UpdateGame(game);
 
                 var response = game.ToResponseModel();
                 await GameHub.SendUpdate(_clients, id, response);
@@ -112,7 +112,7 @@ namespace Blazor20Questions.Server.Controllers
                     return BadRequest("No more questions allowed");
                 }
 
-                if(!game.AllowConcurrentQuestions && game.Questions.Count > 0 && !game.Questions.Last().HasAnswer)
+                if (!game.AllowConcurrentQuestions && game.Questions.Count > 0 && !game.Questions.Last().HasAnswer)
                 {
                     return BadRequest("Only one question allowed at a time");
                 }
