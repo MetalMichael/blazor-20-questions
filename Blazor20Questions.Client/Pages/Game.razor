@@ -1,5 +1,4 @@
 ﻿@page "/game/{Id:guid}"
-@using System.Net.Http
 @using Blazor20Questions.Shared
 @inherits PlayerComponent
 
@@ -76,7 +75,7 @@ else if (_game != null)
 
             @if (!_game.GuessesCountAsQuestions || _game.QuestionsRemaining > 0)
             {
-                <h2>Make a guess</h2>
+                <h2>Make a Guess</h2>
                 @if (_game.GuessesCountAsQuestions)
                 {
                     <span>Each guess counts as a question, so be sure not to waste an oppertunity!</span>
@@ -94,6 +93,21 @@ else if (_game != null)
                         </div>
                     </div>
                 </form>
+            }
+
+            <h2>Previous Guesses</h2>
+            @if (_game.Guesses.Any())
+            {
+                <div class="guesses">
+                    @foreach (var guess in _game.Guesses)
+                    {
+                        <div class="guess">@guess</div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="guess">(No guesses - yet!)</div>
             }
         </div>
     }
