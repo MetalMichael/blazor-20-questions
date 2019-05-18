@@ -23,7 +23,7 @@ This also includes a [mongo-express](http://mongodb-tools.com/tool/mongo-express
 - [x] Websocket update comms
 - [x] Show previous guesses
 - [ ] Remind the host of their Subject (requires cookie)
-- [ ] Show local times
+- [x] Show local times
 - [ ] Add countdown timer for added suspense!
 - [ ] Improve CSS
 
