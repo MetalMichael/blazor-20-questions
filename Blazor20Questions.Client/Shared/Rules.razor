@@ -6,7 +6,7 @@
         <li>Total Questions: @game.TotalQuestions</li>
         <li>Guesses count as Questions: @game.GuessesCountAsQuestions</li>
         <li>Allow concurrent Questions: @game.AllowConcurrentQuestions</li>
-        <li>End Time: @game.EndTime.ToLongTimeString()</li>
+        <li>End Time: @game.EndTime.ToLocalTime().ToLongTimeString()</li>
     </ul>
 </div>
 
